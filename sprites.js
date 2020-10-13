@@ -131,27 +131,35 @@ function initSprites(img) {
 
 	s_joe = new Sprite(img,   338, 0, 406-338, 107);
 
-	//-------------------- TODO --------------------------
 	s_joe_face = [
-		new Sprite(img, 156, 115, 17, 12),
-		new Sprite(img, 156, 128, 17, 12),
-		new Sprite(img, 156, 141, 17, 12)
+		new Sprite(img, 768, 50, 795-768, 16),
+		new Sprite(img, 768, 66, 795-768, 16),
+		new Sprite(img, 768, 82, 795-768, 16),
+		new Sprite(img, 768, 98, 795-768, 16),
+		new Sprite(img, 768, 114, 795-768, 16),
+		new Sprite(img, 768, 130, 795-768, 16),
+		new Sprite(img, 768, 146, 795-768, 16)
 	];
+	//-------------------- TODO --------------------------
 	s_joe_sweat = [
 		new Sprite(img, 156, 115, 17, 12),
 		new Sprite(img, 156, 128, 17, 12),
 		new Sprite(img, 156, 141, 17, 12)
 	];
-
-	s_winch  = [
-		new Sprite(img, 156, 115, 17, 12),
-		new Sprite(img, 156, 128, 17, 12),
-		new Sprite(img, 156, 141, 17, 12)
-	];
-
+	
 	s_cart = new Sprite(img, 0, 0, 138, 114);
 	//----------------------------------------------------
-	s_rope = new Sprite(img, 275, 179, 284 - 275, 236 - 179);
+	
+	s_winch  = [
+		new Sprite(img, 565, 50, 640-565, 47),
+		new Sprite(img, 565, 97, 640-565, 47),
+		new Sprite(img, 565, 144, 640-565, 47),
+		new Sprite(img, 565, 191, 640-565, 47)
+	];
+
+	s_winch_wood  = new Sprite(img, 565, 242, 640-565, 47);
+
+	s_rope = new Sprite(img, 275, 179, 284 - 275, 246 - 179);
 	s_hook1 = new Sprite(img, 293, 38, 331-293, 118 - 38 );
 	s_hook2 = new Sprite(img, 293, 119 , 331-293, 189 - 119);
 

@@ -15,6 +15,7 @@ bgIndex2 = 0,
 bgIndex3 = 0,
 
 frames = 0,
+targetFPS = 60,
 gameTimer = 0,
 daltaTime = 0,
 startTime = 0,
@@ -35,6 +36,143 @@ states = {
 },
 
 // Game objects //
+Joe = {
+	x:0,
+	y:0,
+
+	scale: 1.5,
+
+	init: function(x,y){
+		this.x = (x - (s_joe.width * this.scale))/2;
+		this.y = y - (s_joe.height * this.scale);
+		faceNormal.x = this.x + (23 * this.scale);
+		faceNormal.y = this.y + (32 * this.scale);
+
+		faceNormal.init();
+		faceNormal.scale = this.scale;
+	},
+
+	update: function() {
+		faceNormal.update();
+	},
+
+	draw: function(ctx){
+		s_joe.drawScaled(ctx, this.x, this.y, s_joe.width * this.scale, s_joe.height * this.scale);
+		faceNormal.draw(ctx);
+	}
+}
+
+faceNormal = {
+	x: 0,
+	y: 0,
+
+	frame: 0,
+	animState: 0,
+	animation: [[0, 1, 2, 1],[4,5,6,5]],
+	animSpeed: 20,
+
+	scale: 1,
+
+	wight: 0,
+
+	init: function(wight = (new Rock_L()).wight){
+		this.wight = wight;
+	},
+
+	update: function() {
+
+		this.animState = 0;
+
+		if(hook.capturedMineral != null){
+			//console.log(hook.capturedMineral);
+			if(hook.capturedMineral.wight >= this.wight){
+				this.animState = 1;
+			}
+		}
+
+		//console.log(this.animState);
+
+		this.frame += frames % this.animSpeed === 0 ? 1 : 0;
+		this.frame %= this.animation[this.animState].length;
+	},
+
+	/**
+	 * Draws bird with rotation to canvas ctx
+	 * 
+	 * @param  {CanvasRenderingContext2D} ctx the context used for
+	 *                                        drawing
+	 */
+	draw: function(ctx) {
+		ctx.save();
+		// translate and rotate ctx coordinatesystem
+		ctx.translate(this.x, this.y);
+		ctx.rotate(this.rotation);
+		
+		var n = this.animation[this.animState][this.frame];
+		// draws the bird with center in origo
+		s_joe_face[n].drawScaled(ctx, 0, 0,s_joe_face[n].width * this.scale, s_joe_face[n].height * this.scale);
+
+		ctx.restore();
+	}
+},
+
+Winch = {
+	x: 0,
+	y: 0,
+
+	frame: 0,
+	animation: [0,1,2,3,2,1],
+	animSpeed: 5,
+
+	scale: 1.5,
+
+	init: function(x,y){
+		this.x = ((x - ((s_winch[0].width + 22) * this.scale))/2);
+		this.y = y - (s_winch[0].height * this.scale);
+	},
+
+	update: function() {
+		//console.log(this.animState);
+
+		if(hook.speed < 0){
+			this.frame += frames % this.animSpeed === 0 ? 1 : 0;
+			this.frame %= this.animation.length;
+		}
+	},
+
+	/**
+	 * Draws bird with rotation to canvas ctx
+	 * 
+	 * @param  {CanvasRenderingContext2D} ctx the context used for
+	 *                                        drawing
+	 */
+	draw: function(ctx) {
+
+		ctx.save();
+		// translate and rotate ctx coordinatesystem
+		ctx.translate(this.x , this.y + 24);
+		ctx.rotate(this.rotation);
+		
+		var n = this.animation[this.frame];
+		// draws the bird with center in origo
+		s_winch_wood.drawScaled(ctx, 0,0 ,s_winch_wood.width * this.scale, s_winch_wood.height * this.scale);
+
+		ctx.restore();
+
+		hook.draw(ctx);
+
+		ctx.save();
+		// translate and rotate ctx coordinatesystem
+		ctx.translate(this.x, this.y);
+		ctx.rotate(this.rotation);
+		
+		var n = this.animation[this.frame];
+		// draws the bird with center in origo
+		s_winch[n].drawScaled(ctx, 0,0 ,s_winch[n].width * this.scale, s_winch[n].height * this.scale);
+
+		ctx.restore();
+	}
+},
 
 hook = {
 
@@ -42,19 +180,20 @@ hook = {
 	y: 0,
 
 	length: 0,
+	baseSpeed: 400,
 	speed: 0,
 	rotation: 0,
 	baseRotSpeed: 1.5,
 	rotSpeed: 1.5,
 
-	capturedMineralIndex: -1,
+	capturedMineral: null,
 
 	/**
 	 * Makes the bird "flap" and jump
 	 */
 	fire: function() {
 		if(this.speed == 0){
-			this.speed = 150;
+			this.speed = this.baseSpeed;
 			this.baseRotSpeed = this.rotSpeed;
 			this.rotSpeed = 0;
 		}
@@ -69,7 +208,14 @@ hook = {
 
 			this.rotation += this.rotSpeed * daltaTime;
 
-			if(Math.abs(this.rotation) >= (Math.PI/2)){
+			if(Math.abs(this.rotation) > (Math.PI/2.25)){
+				
+				if(this.rotation > 0){
+					this.rotation = Math.PI/2.25;
+				} else {
+					this.rotation = -Math.PI/2.25;
+				}
+
 				this.rotSpeed = -this.rotSpeed;
 			}
 
@@ -77,38 +223,38 @@ hook = {
 				this.length += this.speed * daltaTime;
 
 				//Calc Vector
-				let vec = [0, (s_rope.height + this.length)];
+				let vec = [0, (s_rope.height + this.length + 10)];
 				//Rotate
 				vec = [Math.cos(this.rotation)*vec[0] - Math.sin(this.rotation)*vec[1],Math.sin(this.rotation)*vec[0] + Math.cos(this.rotation)*vec[1]];
 				//Translate
 				vec[0] += this.x;
 				vec[1] += this.y;
-				if(this.capturedMineralIndex == -1){
+				if(this.capturedMineral == null){
 					//Check for collision
 					for(let i = 0; i < minerals.length; i++){
 						if(minerals[i].intersects(vec[0] , vec[1])){
 							console.log("Hit some rock with index " + i + " @ " + vec);
-							this.capturedMineralIndex = i;
-							this.speed = -this.speed;
+							this.capturedMineral = minerals[i];
+							minerals.splice(i, 1);
+							this.speed = -(this.speed-this.capturedMineral.wight);
 							break;
 						}
 					}
 				} else {
-					minerals[this.capturedMineralIndex].x = vec[0] - (minerals[this.capturedMineralIndex].sprite.width/2);
-					minerals[this.capturedMineralIndex].y = vec[1] - (minerals[this.capturedMineralIndex].sprite.height/2);
+					let offset = [0, ((this.capturedMineral.sprite.height + this.capturedMineral.sprite.width)/4)];
+					//Rotate
+					offset = [Math.cos(this.rotation + Math.PI)*offset[0] - Math.sin(this.rotation+ Math.PI)*offset[1],Math.sin(this.rotation+ Math.PI)*offset[0] + Math.cos(this.rotation+ Math.PI)*offset[1]];
+
+					this.capturedMineral.x = vec[0] - (offset[0] + (this.capturedMineral.sprite.height/2));
+					this.capturedMineral.y = vec[1] - (offset[1] + (this.capturedMineral.sprite.width/2));
+
+					//this.capturedMineral.x = vec[0] - (this.capturedMineral.sprite.width/2);
+					//this.capturedMineral.y = vec[1] - (this.capturedMineral.sprite.height/2);
 				}
 			}
 			
 			if(this.length < 0){
-				this.length = 0;
-				this.speed = 0;
-				this.rotSpeed = this.baseRotSpeed;
-
-				if(this.capturedMineralIndex > -1){
-					score += minerals[this.capturedMineralIndex].value;
-					minerals.splice(this.capturedMineralIndex, 1);
-					this.capturedMineralIndex = -1;
-				}
+				this.reset();
 			}
 
 			if((this.length > (Math.pow(Math.pow(width / 2, 2) + Math.pow((height - floorHeight), 2), 0.5))) && (this.speed > 0)){
@@ -122,16 +268,65 @@ hook = {
 		}
 	},
 
+	reset: function(){
+		this.length = 0;
+		this.speed = 0;
+		this.rotSpeed = this.baseRotSpeed;
+
+		if(this.capturedMineral != null){
+			score += this.capturedMineral.value;
+			this.capturedMineral = null;
+		}
+	},
+
 	draw: function(ctx) {
+		
+		let hookHeight = 15;
+
+		ctx.save();
+		// translate and rotate ctx coordinatesystem
+		ctx.translate(this.x, this.y);
+		ctx.rotate(this.rotation);
+
+		if(this.capturedMineral == null){
+			ctx.save();
+			ctx.translate( -(s_hook2.width/2 - 10), (s_rope.height + this.length) - (hookHeight - 12));
+			ctx.rotate(-Math.PI/6);
+			
+			s_hook2.draw(ctx, 0, 0);
+
+			ctx.restore();
+		} else {
+			s_hook2.draw(ctx, -(s_hook2.width/2 - 13), (s_rope.height + this.length) - hookHeight);
+		}
+		// draws the rope with center in origo
+		s_rope.drawScaled(ctx, -s_rope.width/2, 0, 0, (s_rope.height + this.length));
+		
+		ctx.restore();
+		
+		//Draw mineral
+		if(this.capturedMineral != null){
+			this.capturedMineral.draw(ctx);
+		}
+
 		ctx.save();
 		// translate and rotate ctx coordinatesystem
 		ctx.translate(this.x, this.y);
 		ctx.rotate(this.rotation);
 		
-		// draws the rope with center in origo
-		s_rope.drawScaled(ctx, -s_rope.width/2, 0, 0, (s_rope.height + this.length));
+		if(this.capturedMineral == null){
+			ctx.save();
+			ctx.translate( -(s_hook1.width/2 - 5), (s_rope.height + this.length) - (hookHeight + 10));
+			ctx.rotate(Math.PI/6);
+			
+			s_hook1.draw(ctx, 0, 0);
 
+			ctx.restore();
+		} else {
+			s_hook1.draw(ctx, -(s_hook1.width/2 + 7), (s_rope.height + this.length) - (hookHeight + 10));
+		}
 		ctx.restore();
+
 	}
 };
 
@@ -169,7 +364,7 @@ Mineral.prototype.draw = function(ctx) {
 let Gold_S = function () {
 	Mineral.apply(this, arguments);
 	this.value =  25;
-	this.wight = 10;
+	this.wight = 75;
 	this.sprite = s_gold_s;
 };
 
@@ -179,7 +374,7 @@ Gold_S.prototype.constructor = Gold_S;
 let Gold_M = function () {
 	Mineral.apply(this, arguments);
 	this.value =  50;
-	this.wight = 30;
+	this.wight = 150;
 	this.sprite = s_gold_m;
 };
 
@@ -189,7 +384,7 @@ Gold_M.prototype.constructor = Gold_M;
 let Gold_L = function () {
 	Mineral.apply(this, arguments);
 	this.value =  150;
-	this.wight = 50;
+	this.wight = 225;
 	this.sprite = s_gold_l;
 };
 
@@ -199,7 +394,7 @@ Gold_L.prototype.constructor = Gold_L;
 let Rock_S = function () {
 	Mineral.apply(this, arguments);
 	this.value =  5;
-	this.wight = 10;
+	this.wight = 50;
 	this.sprite = s_rock_s;
 };
 
@@ -209,7 +404,7 @@ Rock_S.prototype.constructor = Rock_S;
 let Rock_M = function () {
 	Mineral.apply(this, arguments);
 	this.value =  15;
-	this.wight = 30;
+	this.wight = 100;
 	this.sprite = s_rock_m;
 };
 
@@ -219,7 +414,7 @@ Rock_M.prototype.constructor = Rock_M;
 let Rock_L = function () {
 	Mineral.apply(this, arguments);
 	this.value =  25;
-	this.wight = 50;
+	this.wight = 150;
 	this.sprite = s_rock_l;
 };
 
@@ -229,7 +424,7 @@ Rock_L.prototype.constructor = Rock_L;
 let Diamond = function () {
 	Mineral.apply(this, arguments);
 	this.value =  250;
-	this.wight = 5;
+	this.wight = 15;
 	this.sprite = s_diamond;
 };
 
@@ -251,6 +446,7 @@ function main() {
 	// listen for input event
 	document.addEventListener("touchstart", onInputPress);
 	document.addEventListener("mousedown", onInputPress);
+	document.addEventListener("keydown", onKeyInputPress);
 	
 	if (!(!!canvas.getContext && canvas.getContext("2d"))) {
 		alert("Your browser doesn't support HTML5, please update to latest version");
@@ -284,8 +480,11 @@ function main() {
 		
 		floorHeight =  s_entrance.height + 33;
 		
+		Joe.init(width , floorHeight);
+		Winch.init(width , floorHeight);
+
 		hook.x = (width-s_rope.width) / 2;
-		hook.y = floorHeight - 10;
+		hook.y = floorHeight - 20;
 		
 		
 		run();
@@ -313,23 +512,28 @@ function update() {
 	frames++;
 	if (currentstate === states.Init) {
 		gameInit();
+		hook.reset();
 	}else if (currentstate === states.Game) {
-		if((minerals.length == 0) || (gameTimer <= 0)){
+		if(((minerals.length == 0) && (hook.capturedMineral == null)) || (gameTimer <= 0)){
 			currentstate = states.Score;
 			gameTimer = 0;
 		}
 
+		Joe.update();
+		Winch.update();
+		hook.update();
+		
 		endTime = new Date();
 		daltaTime = (endTime - startTime) / 1000;
 		gameTimer -= daltaTime;
 		startTime = new Date();
+		Sleep(((1/targetFPS)-daltaTime) * 1000);
 
 	} else if (currentstate === states.Score) {
 		best = Math.max(best, score);
 		localStorage.setItem("best", best);	
 	}
 
-	hook.update();
 }
 
 function gameInit(){
@@ -339,6 +543,9 @@ function gameInit(){
 	bgIndex3 = getRandomInt(0, s_bg3.length-1);
 	
 	floorHeight =  s_entrance.height + 33;
+
+	Joe.init(width , floorHeight);
+	Winch.init(width , floorHeight);
 
 	minerals = [];
 
@@ -389,7 +596,7 @@ function placeMinerals(mineralClass,count,){
 }
 
 /**
- * Draws bird and all pipes and assets to the canvas
+ * Draws no bird and no pipes but the other assets to the canvas
  */
 function render() {
 	// draw background color
@@ -425,7 +632,7 @@ function render() {
 	ctx.fillStyle = "#000";
 	ctx.fillRect(0, s_entrance.height + 33 - 10, width, 10);
 
-	s_joe.draw(ctx,(width-s_joe.width)/2 , floorHeight - s_joe.height );
+	Joe.draw(ctx,width,floorHeight);
 
 	
 	if (currentstate === states.Game) {
@@ -453,9 +660,9 @@ function render() {
 		ctx.lineWidth = 1;
 	}
 	
-	// Draw hook infront of minerals
-	hook.draw(ctx);
-
+	// Draw winch infront of minerals
+	Winch.draw(ctx);
+	
 	if (currentstate === states.Score) {
 		s_buttons.next.drawScaled(ctx,(width-(s_buttons.next.width*2))/2 , (height-(s_buttons.next.height*2))/2,s_buttons.next.width * 2, s_buttons.next.height * 2);
 
@@ -473,6 +680,13 @@ function render() {
  * 
  * @param  {MouseEvent/TouchEvent} evt tho on press event
  */
+function onKeyInputPress(evt) {
+	//console.log(evt);
+	if(evt.key === " "){
+		onInputPress(evt);
+	}
+}
+
 function onInputPress(evt) {
 
 	switch (currentstate) {
@@ -530,6 +744,11 @@ function onResize(){
 	if(s_rope){
 		hook.x = (width-s_rope.width) / 2;
 	}
+
+	if(floorHeight){
+		Joe.init(width , floorHeight);
+		Winch.init(width , floorHeight);
+	}
 }
 /**
  * Returns a random number between min (inclusive) and max (exclusive)
@@ -549,4 +768,9 @@ function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function Sleep(milliseconds) {
+	//console.log(milliseconds)
+	return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
