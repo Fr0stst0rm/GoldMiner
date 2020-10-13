@@ -67,8 +67,13 @@ let BGSprite = function(img, x, y, width, height, topColor, bottomColor) {
  * @param  {number} y   y-position on canvas to draw from
  */
 Sprite.prototype.draw = function(ctx, x, y) {
-	ctx.drawImage(this.img, this.x, this.y, this.width, this.height,
-		x, y, this.width, this.height);
+	//TODO DEl after Debug
+	//ctx.rect(this.x, this.y, this.width, this.height);
+	//ctx.stroke();
+	//ctx.rect(x, y, this.width, this.height);
+	//ctx.stroke();
+	//Draw Img
+	ctx.drawImage(this.img, this.x, this.y, this.width, this.height, x, y, this.width, this.height);
 };
 
 /**
@@ -93,9 +98,6 @@ BGSprite.prototype.drawBackGround = function(ctx, x, y, scaleWidthTo=0, scaleHei
 	Sprite.prototype.drawScaled.call(this, ctx, x, y, scaleWidthTo, scaleHeightTo)
 };
 
-BGSprite.prototype = Sprite.prototype;
-BGSprite.prototype.constructor = BGSprite;
-
 /**
  * Initate all sprite
  * 
@@ -104,28 +106,32 @@ BGSprite.prototype.constructor = BGSprite;
 function initSprites(img) {
 
 	s_bg1 = [
-		new BGSprite(img,   0, 313, 1024, 390-313,"#ceb35f","#a6904d"),
-		new BGSprite(img,   0, 390, 1024, 508-390,"#ceb35f","#a6904d"),
-		new BGSprite(img,   0, 508, 1024, 609-508,"#ceb35f","#a6904d")
+		new BGSprite(img,   0, 313, 1024, 388-313,"#ceb35f","#a6904d"),
+		new BGSprite(img,   0, 390, 1024, 507-390,"#ceb35f","#a6904d"),
+		new BGSprite(img,   0, 508, 1024, 608-508,"#ceb35f","#a6904d")
 	];
 
 	s_bg2 = [
-		new BGSprite(img,   0, 609, 1024, 687-609,"#a6904d","#806e3b"),
-		new BGSprite(img,   0, 687, 1024, 805-687,"#a6904d","#806e3b")
+		new BGSprite(img,   0, 610, 1024, 685-610,"#a6904d","#806e3b"),
+		new BGSprite(img,   0, 687, 1024, 804-687,"#a6904d","#806e3b")
 	];
 
 	s_bg3 = [
-		new BGSprite(img,   0, 805, 1024, 924-805,"#806e3b","#66675d"),
+		new BGSprite(img,   0, 805, 1024, 923-805,"#806e3b","#66675d"),
 		new BGSprite(img,   0, 924, 1024, 1024-924,"#806e3b","#66675d")
 	];
 
 	s_entrance = new Sprite(img,   796, 50, 1024-796, 234-50);
-
+	
+	//-------------------- TODO --------------------------
 	s_support_beam1 = new Sprite(img,   0, 0, 138, 114);
 	s_support_beam2 = new Sprite(img,   0, 0, 138, 114);
 	s_support_beam3 = new Sprite(img,   0, 0, 138, 114);
+	//----------------------------------------------------
 
-	s_joe = new Sprite(img,   0, 0, 138, 114);
+	s_joe = new Sprite(img,   338, 0, 406-338, 107);
+
+	//-------------------- TODO --------------------------
 	s_joe_face = [
 		new Sprite(img, 156, 115, 17, 12),
 		new Sprite(img, 156, 128, 17, 12),
@@ -142,23 +148,26 @@ function initSprites(img) {
 		new Sprite(img, 156, 128, 17, 12),
 		new Sprite(img, 156, 141, 17, 12)
 	];
-	s_cart = new Sprite(img,   0, 0, 138, 114);
-	s_rope = new Sprite(img,   0, 0, 138, 114);
-	s_hook1 = new Sprite(img,   0, 0, 138, 114);
-	s_hook2 = new Sprite(img,   0, 0, 138, 114);
 
-	s_gold_s = new Sprite(img,   203, 97, 277-203, 170-97);
-	s_gold_m = new Sprite(img,  198, 0, 198-293, 93);
-	s_gold_l = new Sprite(img,   0, 0, 163, 198);
+	s_cart = new Sprite(img, 0, 0, 138, 114);
+	//----------------------------------------------------
+	s_rope = new Sprite(img, 275, 179, 284 - 275, 236 - 179);
+	s_hook1 = new Sprite(img, 293, 38, 331-293, 118 - 38 );
+	s_hook2 = new Sprite(img, 293, 119 , 331-293, 189 - 119);
 
-	s_rock_s = new Sprite(img,   566, 0, 566-620, 50);
-	s_rock_m = new Sprite(img,   164, 175, 250-164, 260-175);
-	s_rock_l = new Sprite(img,   1, 164, 160-1, 256-164);
+	s_gold_s = new Sprite(img, 203, 97, 277-203, 170-97);
+	s_gold_m = new Sprite(img, 198, 0, 293-198, 93);
+	s_gold_l = new Sprite(img, 0, 0, 198, 163);
 
-	s_diamond = new Sprite(img,   259, 0, 338-259, 37);
+	s_rock_s = new Sprite(img, 566, 0, 620-566, 50);
+	s_rock_m = new Sprite(img, 164, 175, 260-164, 250-175);
+	s_rock_l = new Sprite(img, 1, 164, 160-1, 256-164);
+
+	s_diamond = new Sprite(img, 295, 0, 338-295, 37);
 	
 	s_buttons = {
-		start:  new Sprite(img,  79, 177, 40, 14),
-		restart:  new Sprite(img, 119, 177, 40, 14)
+		start:  new Sprite(img,  338, 110, 552-338, 160-110),
+		restart:  new Sprite(img, 338, 161, 552-338, 214-161),
+		next:  new Sprite(img, 338, 215, 552-338, 267-215)
 	}
 }
