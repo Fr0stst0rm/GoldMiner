@@ -97,12 +97,6 @@ faceNormal = {
 		this.frame %= this.animation[this.animState].length;
 	},
 
-	/**
-	 * Draws bird with rotation to canvas ctx
-	 * 
-	 * @param  {CanvasRenderingContext2D} ctx the context used for
-	 *                                        drawing
-	 */
 	draw: function(ctx) {
 		ctx.save();
 		// translate and rotate ctx coordinatesystem
@@ -110,7 +104,6 @@ faceNormal = {
 		ctx.rotate(this.rotation);
 		
 		var n = this.animation[this.animState][this.frame];
-		// draws the bird with center in origo
 		s_joe_face[n].drawScaled(ctx, 0, 0,s_joe_face[n].width * this.scale, s_joe_face[n].height * this.scale);
 
 		ctx.restore();
@@ -141,12 +134,6 @@ Winch = {
 		}
 	},
 
-	/**
-	 * Draws bird with rotation to canvas ctx
-	 * 
-	 * @param  {CanvasRenderingContext2D} ctx the context used for
-	 *                                        drawing
-	 */
 	draw: function(ctx) {
 
 		ctx.save();
@@ -155,7 +142,6 @@ Winch = {
 		ctx.rotate(this.rotation);
 		
 		var n = this.animation[this.frame];
-		// draws the bird with center in origo
 		s_winch_wood.drawScaled(ctx, 0,0 ,s_winch_wood.width * this.scale, s_winch_wood.height * this.scale);
 
 		ctx.restore();
@@ -168,7 +154,6 @@ Winch = {
 		ctx.rotate(this.rotation);
 		
 		var n = this.animation[this.frame];
-		// draws the bird with center in origo
 		s_winch[n].drawScaled(ctx, 0,0 ,s_winch[n].width * this.scale, s_winch[n].height * this.scale);
 
 		ctx.restore();
@@ -189,9 +174,6 @@ hook = {
 
 	capturedMineral: null,
 
-	/**
-	 * Makes the bird "flap" and jump
-	 */
 	fire: function() {
 		if(this.speed == 0){
 			this.speed = this.baseSpeed;
@@ -200,9 +182,6 @@ hook = {
 		}
 	},
 
-	/**
-	 * Update sprite animation and position of bird
-	 */
 	update: function() {
 		
 		if (currentstate === states.Game) {
@@ -507,9 +486,6 @@ function run() {
 	window.requestAnimationFrame(loop, canvas);
 }
 
-/**
- * Update forground, bird and pipes position
- */
 function update() {
 	frames++;
 	if (currentstate === states.Init) {
@@ -577,7 +553,7 @@ function gameInit(){
 
 	score = 0;
 
-	gameTimer = 50;
+	gameTimer = 60;
 	startTime = new Date();
 
 	currentstate = states.Game;
@@ -697,7 +673,6 @@ function onInputPress(evt) {
 			currentstate = states.Init;
 			break;
 
-		// update bird speed
 		case states.Game:
 			hook.fire();
 			break;
