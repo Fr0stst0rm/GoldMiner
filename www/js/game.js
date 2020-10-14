@@ -49,8 +49,6 @@ Joe = {
 		faceNormal.x = this.x + (23 * this.scale);
 		faceNormal.y = this.y + (32 * this.scale);
 
-		this.scale = gameScale;
-
 		faceNormal.init();
 		faceNormal.scale = this.scale;
 	},
@@ -123,8 +121,6 @@ Winch = {
 	x: 0,
 	y: 0,
 
-	scale: 1,
-
 	frame: 0,
 	animation: [0,1,2,3,2,1],
 	animSpeed: 5,
@@ -134,9 +130,6 @@ Winch = {
 	init: function(x,y){
 		this.x = ((x - ((s_winch[0].width + 22) * this.scale))/2);
 		this.y = y - (s_winch[0].height * this.scale);
-
-		this.scale = gameScale;
-		hook.scale = gameScale;//-0.5;
 	},
 
 	update: function() {
@@ -186,8 +179,6 @@ hook = {
 
 	x: 0,
 	y: 0,
-
-	scale: 1,
 
 	length: 0,
 	baseSpeed: 400,
@@ -300,17 +291,17 @@ hook = {
 
 		if(this.capturedMineral == null){
 			ctx.save();
-			ctx.translate( -(s_hook2.width/2 - 10) * this.scale, ((s_rope.height + this.length) - (hookHeight - 12)) * this.scale);
+			ctx.translate( -(s_hook2.width/2 - 10), (s_rope.height + this.length) - (hookHeight - 12));
 			ctx.rotate(-Math.PI/6);
 			
-			s_hook2.drawScaled(ctx, 0, 0,s_hook2.width* this.scale, s_hook2.height* this.scale);
+			s_hook2.draw(ctx, 0, 0);
 
 			ctx.restore();
 		} else {
-			s_hook2.drawScaled(ctx, -(s_hook2.width/2 - 13) * this.scale, (s_rope.height + this.length) - hookHeight * this.scale,s_hook2.width* this.scale, s_hook2.height* this.scale);
+			s_hook2.draw(ctx, -(s_hook2.width/2 - 13), (s_rope.height + this.length) - hookHeight);
 		}
 		// draws the rope with center in origo
-		s_rope.drawScaled(ctx, -s_rope.width/2* this.scale, 0, s_rope.width * this.scale, (s_rope.height + this.length));
+		s_rope.drawScaled(ctx, -s_rope.width/2, 0, 0, (s_rope.height + this.length));
 		
 		ctx.restore();
 		
@@ -326,14 +317,14 @@ hook = {
 		
 		if(this.capturedMineral == null){
 			ctx.save();
-			ctx.translate( -(s_hook1.width/2 - 5) * this.scale, (s_rope.height + this.length) - (hookHeight + 10) * this.scale);
+			ctx.translate( -(s_hook1.width/2 - 5), (s_rope.height + this.length) - (hookHeight + 10));
 			ctx.rotate(Math.PI/6);
 			
-			s_hook1.drawScaled(ctx, 0, 0,s_hook2.width* this.scale, s_hook2.height* this.scale);
+			s_hook1.draw(ctx, 0, 0);
 
 			ctx.restore();
 		} else {
-			s_hook1.drawScaled(ctx, -(s_hook1.width/2 + 7) * this.scale, (s_rope.height + this.length) - (hookHeight + 10) * this.scale,s_hook2.width* this.scale, s_hook2.height* this.scale);
+			s_hook1.draw(ctx, -(s_hook1.width/2 + 7), (s_rope.height + this.length) - (hookHeight + 10));
 		}
 		ctx.restore();
 
@@ -476,6 +467,7 @@ function main() {
 		initSprites(this);
 		ctx.fillStyle = bgColor;
 		ctx.font = "50px Arial";
+		ctx.scale(gameScale,gameScale);
 
 		startBtn = {
 			x: 0,
@@ -611,31 +603,31 @@ function placeMinerals(mineralClass,count,){
 function render() {
 	// draw background color
 	ctx.fillStyle = bgColor;
-	ctx.fillRect(0, 0, width, height);
+	ctx.fillRect(0, 0, width / gameScale, height / gameScale);
 	// draw background sprites
 	
-	let pitHeight = (height - floorHeight) / 3;
+	let pitHeight = ((height/gameScale) - floorHeight) / 3;
 
 	let bgHeight = Math.max(floorHeight, floorHeight + (pitHeight * 1) - (pitHeight / 2));
 	ctx.fillStyle = s_bg1[bgIndex1].topColor;
-	ctx.fillRect(0, floorHeight, width, pitHeight/2);
+	ctx.fillRect(0, floorHeight, width , pitHeight/2);
 	ctx.fillStyle = s_bg1[bgIndex1].bottomColor;
-	ctx.fillRect(0, bgHeight, width, pitHeight/2 );
-	s_bg1[bgIndex1].drawBackGround(ctx, 0, bgHeight - (s_bg1[bgIndex1].height/2), width );
+	ctx.fillRect(0, bgHeight, width , pitHeight/2 );
+	s_bg1[bgIndex1].drawBackGround(ctx, 0, bgHeight - (s_bg1[bgIndex1].height/2), width/ gameScale );
 
 	bgHeight = Math.max(floorHeight + s_bg1[bgIndex1].height, floorHeight + (pitHeight * 2) - (pitHeight / 2));
 	ctx.fillStyle = s_bg2[bgIndex2].topColor;
-	ctx.fillRect(0, floorHeight + (pitHeight * 1), width, pitHeight/2);
+	ctx.fillRect(0, floorHeight + (pitHeight * 1), width/ gameScale, pitHeight/2);
 	ctx.fillStyle = s_bg2[bgIndex2].bottomColor;
-	ctx.fillRect(0, bgHeight, width, pitHeight/2 );
-	s_bg2[bgIndex2].drawBackGround(ctx, 0,bgHeight - (s_bg2[bgIndex2].height/2), width); // + X Für debug
+	ctx.fillRect(0, bgHeight, width/ gameScale, pitHeight/2 );
+	s_bg2[bgIndex2].drawBackGround(ctx, 0,bgHeight - (s_bg2[bgIndex2].height/2), width/ gameScale); // + X Für debug
 
 	bgHeight = Math.max(floorHeight + s_bg1[bgIndex1].height + s_bg2[bgIndex2].height, floorHeight + (pitHeight * 3) - (pitHeight / 2) );
 	ctx.fillStyle = s_bg3[bgIndex3].topColor;
 	ctx.fillRect(0, floorHeight + (pitHeight * 2), width, pitHeight/2);
 	ctx.fillStyle = s_bg3[bgIndex3].bottomColor;
-	ctx.fillRect(0, bgHeight, width, pitHeight/2 );
-	s_bg3[bgIndex3].drawBackGround(ctx, 0, bgHeight - (s_bg3[bgIndex3].height/2), width);
+	ctx.fillRect(0, bgHeight, width/ gameScale, pitHeight/2 );
+	s_bg3[bgIndex3].drawBackGround(ctx, 0, bgHeight - (s_bg3[bgIndex3].height/2), width/ gameScale);
 
 	s_entrance.draw(ctx, (width-s_entrance.width)/2, 33);
 	
@@ -650,7 +642,7 @@ function render() {
 	}
 	
 	if (currentstate === states.Start) {
-		s_buttons.start.drawScaled(ctx,(width-(s_buttons.start.width*gameScale * 1.5))/2 , (height-(s_buttons.start.height*gameScale * 1.5))/2,s_buttons.start.width * gameScale * 1.5, s_buttons.start.height * gameScale * 1.5);
+		s_buttons.start.drawScaled(ctx,(width-(s_buttons.start.width*2))/2 , (height-(s_buttons.start.height*2))/2,s_buttons.start.width * 2, s_buttons.start.height * 2);
 	} else {
 		
 		for(let i = 0; i < minerals.length; i++){
@@ -674,7 +666,7 @@ function render() {
 	Winch.draw(ctx);
 	
 	if (currentstate === states.Score) {
-		s_buttons.next.drawScaled(ctx,(width-(s_buttons.next.width * gameScale * 1.5))/2 , (height-(s_buttons.next.height*gameScale * 1.5))/2,s_buttons.next.width * gameScale * 1.5, s_buttons.next.height * gameScale * 1.5);
+		s_buttons.next.drawScaled(ctx,(width-(s_buttons.next.width*2))/2 , (height-(s_buttons.next.height*2))/2,s_buttons.next.width * 2, s_buttons.next.height * 2);
 
 	} else {
 		// draw score to top of canvas
@@ -746,13 +738,14 @@ function onResize(){
 	canvas.width = width;
 	canvas.height = height;
 	
-	gameScale = (1.75 * height/1080);
+	gameScale = (height/937);
 	console.log("New Scale " + gameScale);
 	
 	//console.log(width +" / "+height + " = " + (width / height) );
 
 	if(ctx){
 		ctx.font = "50px Arial";
+		ctx.scale(gameScale,gameScale);
 	}
 
 	if(s_rope){
@@ -764,7 +757,6 @@ function onResize(){
 		Winch.init(width , floorHeight);
 	}
 }
-
 /**
  * Returns a random number between min (inclusive) and max (exclusive)
  */
