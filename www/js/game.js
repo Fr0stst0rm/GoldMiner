@@ -603,31 +603,31 @@ function placeMinerals(mineralClass,count,){
 function render() {
 	// draw background color
 	ctx.fillStyle = bgColor;
-	ctx.fillRect(0, 0, width / gameScale, height / gameScale);
+	ctx.fillRect(0, 0, width, height);
 	// draw background sprites
 	
-	let pitHeight = ((height/gameScale) - floorHeight) / 3;
+	let pitHeight = (height - floorHeight) / 3;
 
 	let bgHeight = Math.max(floorHeight, floorHeight + (pitHeight * 1) - (pitHeight / 2));
 	ctx.fillStyle = s_bg1[bgIndex1].topColor;
-	ctx.fillRect(0, floorHeight, width , pitHeight/2);
+	ctx.fillRect(0, floorHeight, width, pitHeight/2);
 	ctx.fillStyle = s_bg1[bgIndex1].bottomColor;
-	ctx.fillRect(0, bgHeight, width , pitHeight/2 );
-	s_bg1[bgIndex1].drawBackGround(ctx, 0, bgHeight - (s_bg1[bgIndex1].height/2), width/ gameScale );
+	ctx.fillRect(0, bgHeight, width, pitHeight/2 );
+	s_bg1[bgIndex1].drawBackGround(ctx, 0, bgHeight - (s_bg1[bgIndex1].height/2), width );
 
 	bgHeight = Math.max(floorHeight + s_bg1[bgIndex1].height, floorHeight + (pitHeight * 2) - (pitHeight / 2));
 	ctx.fillStyle = s_bg2[bgIndex2].topColor;
-	ctx.fillRect(0, floorHeight + (pitHeight * 1), width/ gameScale, pitHeight/2);
+	ctx.fillRect(0, floorHeight + (pitHeight * 1), width, pitHeight/2);
 	ctx.fillStyle = s_bg2[bgIndex2].bottomColor;
-	ctx.fillRect(0, bgHeight, width/ gameScale, pitHeight/2 );
-	s_bg2[bgIndex2].drawBackGround(ctx, 0,bgHeight - (s_bg2[bgIndex2].height/2), width/ gameScale); // + X Für debug
+	ctx.fillRect(0, bgHeight, width, pitHeight/2 );
+	s_bg2[bgIndex2].drawBackGround(ctx, 0,bgHeight - (s_bg2[bgIndex2].height/2), width); // + X Für debug
 
 	bgHeight = Math.max(floorHeight + s_bg1[bgIndex1].height + s_bg2[bgIndex2].height, floorHeight + (pitHeight * 3) - (pitHeight / 2) );
 	ctx.fillStyle = s_bg3[bgIndex3].topColor;
 	ctx.fillRect(0, floorHeight + (pitHeight * 2), width, pitHeight/2);
 	ctx.fillStyle = s_bg3[bgIndex3].bottomColor;
-	ctx.fillRect(0, bgHeight, width/ gameScale, pitHeight/2 );
-	s_bg3[bgIndex3].drawBackGround(ctx, 0, bgHeight - (s_bg3[bgIndex3].height/2), width/ gameScale);
+	ctx.fillRect(0, bgHeight, width, pitHeight/2 );
+	s_bg3[bgIndex3].drawBackGround(ctx, 0, bgHeight - (s_bg3[bgIndex3].height/2), width);
 
 	s_entrance.draw(ctx, (width-s_entrance.width)/2, 33);
 	
@@ -740,6 +740,9 @@ function onResize(){
 	
 	gameScale = (height/937);
 	console.log("New Scale " + gameScale);
+
+	width /= gameScale;
+	height /= gameScale; 
 	
 	//console.log(width +" / "+height + " = " + (width / height) );
 
